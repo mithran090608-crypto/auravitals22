@@ -260,23 +260,20 @@ if current_voice > VOICE_INSTABILITY_THRESHOLD:
 
 if len(risk_flags) > 0:
     st.error(f"⚠️ **Clinical Alert: Potential Health Issues Detected for {active_patient['name']}**")
-    st.markdown(f"**Diagnostic Evaluation:** You have the **{active_patient['condition']}** health issue.")
+    st.markdown(f"**Diagnostic Evaluation:** Patient exhibits indicators associated with **{active_patient['condition']}**.")
     st.markdown("The system telemetry has flagged the following concerns:")
     for flag in risk_flags:
         st.markdown(f"- 🔴 {flag}")
-    st.warning("💡 **Recommended Action:** Schedule a clinical follow-up or review trends below.")
+    st.warning("💡 **Recommended Action:** Schedule a clinical follow-up or review historical trends below.")
 else:
-    st.success(f"✅ **Health Status: Good to Go & Stable ({active_patient['name']})**")
-    st.markdown(f"**Diagnostic Evaluation:** You didn’t have the **{active_patient['condition']}** issue; your voice instability index and vitals are normal and good.")
+    st.success(f"✅ **Health Status: Stable & Within Target Parameters ({active_patient['name']})**")
+    st.markdown(f"**Diagnostic Evaluation:** No acute markers for **{active_patient['condition']}** detected; acoustic indices and vital signs remain within normal baseline parameters.")
     st.markdown("All vital measurements and acoustic indices are operating within optimal healthy parameters.")
     st.markdown(f"- **Heart Rate:** {current_hr} BPM (Stable)")
     st.markdown(f"- **Oxygen Saturation (SpO2):** {current_spo2}% (Optimal)")
     st.markdown(f"- **Systolic BP:** {current_bp} mmHg (Normal)")
     st.markdown(f"- **Voice Instability Index:** {current_voice:.2f} ({voice_status})")
     st.info("💡 **Recommended Action:** Continue standard remote monitoring schedule.")
-
-st.markdown("---")
-
 # --- SECTION 5: HISTORICAL TREND VISUALIZATIONS ---
 st.subheader("📈 30-Day Historical Telemetry & Trends")
 chart_tab1, chart_tab2 = st.tabs(["Vitals & Hemodynamics", "Acoustic & Voice Biomarkers"])
