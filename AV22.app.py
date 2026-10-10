@@ -1,6 +1,8 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import io
+import wave
 
 # Safe import for scipy to prevent ModuleNotFoundError crashes
 try:
@@ -18,13 +20,26 @@ class VoiceBiometricEngine:
 
     def analyze_uploaded_file(self, audio_bytes: bytes) -> dict:
         """
-        Parses raw audio files, extracts Jitter/Shimmer, and measures 
-        fundamental pitch (F0) to screen for Endocrine/Thyroid fluid accumulation.
+        Parses raw WAV audio files correctly using wave module, extracts Jitter/Shimmer, 
+        and measures fundamental pitch (F0) to screen for Endocrine/Thyroid fluid accumulation.
         """
         try:
-            waveform = np.frombuffer(audio_bytes, dtype=np.int16).astype(np.float32)
+            with wave.open(io.BytesIO(audio_bytes), 'rb') as wf:
+                extracted_sr = wf.getframerate()
+                if extracted_sr > 0:
+                    self.sr = extracted_sr
+                n_frames = wf.getnframes()
+                channels = wf.getnchannels()
+                audio_data = wf.readframes(n_frames)
+                
+            waveform = np.frombuffer(audio_data, dtype=np.int16).astype(np.float32)
+            if channels > 1:
+                waveform = waveform.reshape(-1, channels).mean(axis=1)
         except Exception:
-            waveform = np.frombuffer(audio_bytes, dtype=np.uint8).astype(np.float32)
+            try:
+                waveform = np.frombuffer(audio_bytes, dtype=np.int16).astype(np.float32)
+            except Exception:
+                waveform = np.frombuffer(audio_bytes, dtype=np.uint8).astype(np.float32)
 
         # Fallback values if audio buffer is empty or corrupted
         if len(waveform) < 100 or np.max(np.abs(waveform)) < 1e-4:
